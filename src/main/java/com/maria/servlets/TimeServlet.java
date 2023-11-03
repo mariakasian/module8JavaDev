@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 @WebServlet (value = "/time")
 public class TimeServlet extends HttpServlet {
     private ZonedDateTime zonedDateTime;
-    private String timezone;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -23,7 +22,7 @@ public class TimeServlet extends HttpServlet {
         zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of("UTC"));
 
         // Якщо передано query параметр timezone, то конвертуємо час у переданий часовий пояс
-        timezone = req.getParameter("timezone");
+        String timezone = req.getParameter("timezone");
 
         if (timezone != null) {
             String sign = timezone.substring(3, 4);

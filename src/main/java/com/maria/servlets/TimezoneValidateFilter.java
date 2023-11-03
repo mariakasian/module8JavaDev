@@ -31,7 +31,7 @@ public class TimezoneValidateFilter extends HttpFilter {
         if (timezone.startsWith("UTC")) {
             try {
                 int offsetHours = Integer.parseInt(timezone.substring(4));
-                long offsetMillis = offsetHours * 60 * 60 * 1000;
+                long offsetMillis = (long) offsetHours * 60 * 60 * 1000;
                 String[] availableIDs = TimeZone.getAvailableIDs((int) offsetMillis);
                 return Arrays.asList(availableIDs).contains("Etc/GMT-" + offsetHours);
             } catch (NumberFormatException e) {
