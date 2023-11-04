@@ -11,17 +11,12 @@ import java.time.format.DateTimeFormatter;
 
 @WebServlet (value = "/time")
 public class TimeServlet extends HttpServlet {
-    private ZonedDateTime zonedDateTime;
+    private final Instant instant = Instant.now();
+    private String offset = "";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html; charset=utf-8");
-
-        // Отримуємо поточний час у UTC
-        LocalDateTime localDateTime = LocalDateTime.now();
-        zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of("UTC"));
-
-        // Якщо передано query параметр timezone, то конвертуємо час у переданий часовий пояс
         String timezone = req.getParameter("timezone");
 
         if (timezone != null) {
@@ -29,9 +24,9 @@ public class TimeServlet extends HttpServlet {
             int hoursOffset = Integer.parseInt(timezone.substring(4));
 
             if (sign.equals("-")) {
-                zonedDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC" + "-" + hoursOffset));
+                offset = "-" + hoursOffset;
             } else {
-                zonedDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC" + "+" + hoursOffset));
+                offset = "+" + hoursOffset;
             }
             printResponse(resp);
         } else {
@@ -42,7 +37,8 @@ public class TimeServlet extends HttpServlet {
     private void printResponse(HttpServletResponse resp) throws IOException {
         PrintWriter out = resp.getWriter();
         out.write("<h1>Current time:<br>${dateTime}</h1>"
-            .replace("${dateTime}", zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"))));
+            .replace("${dateTime}", instant.atZone(ZoneId.of("UTC" + offset))
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"))));
         out.close();
     }
 }
